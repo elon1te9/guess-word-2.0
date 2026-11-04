@@ -1,0 +1,88 @@
+using GuessWord.Api.Data;
+using GuessWord.Api.Infrastructure.Security;
+using GuessWord.Api.Models;
+using GuessWord.Contracts.Requests;
+using GuessWord.Contracts.Responses;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
+namespace GuessWord.Api.Features.Auth;
+
+public class AuthService
+{
+    private readonly AppDbContext _context;
+    private readonly IJwtService _jwtService;
+    private readonly PasswordHasher<User> _passwordHasher;
+
+    public AuthService(AppDbContext context, IJwtService jwtService)
+    {
+        _context = context;
+        _jwtService = jwtService;
+        _passwordHasher = new PasswordHasher<User>();
+    }
+
+    public async Task<AuthResponseDto?> Register(RegisterRequestDto request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Login) || string.IsNullOrWhiteSpace(request.Password) || string.IsNullOrWhiteSpace(request.Name))
+            return null;
+
+        var normalizedLogin = request.Login.Trim();
+        var loginExists = await _context.Users.AnyAsync(x => x.Login == normalizedLogin);
+        if (loginExists)
+            return null;
+
+        var normalizedName = request.Name.Trim();
+        var nameExists = await _context.Users.AnyAsync(x => x.Name == normalizedName);
+        if (nameExists)
+            return null;
+
+        var user = new User
+        {
+            Login = normalizedLogin,
+            Name = normalizedName,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        var token = _jwtService.GenerateToken(user);
+
+        return new AuthResponseDto
+        {
+            UserId = user.Id,
+            Token = token,
+            Login = user.Login,
+            Name = user.Name
+        };
+    }
+
+    public async Task<AuthResponseDto?> Login(LoginRequestDto request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Login) || string.IsNullOrWhiteSpace(request.Password))
+            return null;
+
+        var normalizedLogin = request.Login.Trim();
+
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Login == normalizedLogin);
+        if (user is null)
+            return null;
+
+        var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+
+        if (result == PasswordVerificationResult.Failed)
+            return null;
+
+        var token = _jwtService.GenerateToken(user);
+
+        return new AuthResponseDto
+        {
+            UserId = user.Id,
+            Token = token,
+            Login = user.Login,
+            Name = user.Name!
+        };
+    }
+}

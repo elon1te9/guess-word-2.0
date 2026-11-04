@@ -1,0 +1,22 @@
+<section class="match-empty @Class" aria-labelledby="@TitleId">
+                    <div class="match-intro-heading">
+                        <svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true" shape-rendering="crispEdges"><path fill="currentColor" d="M4 2h16v2h2v16h-2v2H4v-2H2V4h2zm2 2v2H4v12h2v2h12v-2h2V6h-2V4zm3 3h6v2h2v4h-4v2h-2v-4h4V9H9zm2 10h2v2h-2z" /></svg>
+                        <h3 id="@TitleId">Как найти загаданное слово?</h3>
+                    </div>
+                    <p class="match-intro-copy">Вводите слова. Чем меньше ранг, тем ближе ваш вариант к ответу по смыслу.</p>
+                    <figure class="match-intro-example">
+                        <figcaption>Пример: загадано «кошка»</figcaption>
+                        <ol class="match-intro-words" aria-label="Условные примеры слов и рангов">
+                            <li class="match-intro-hot"><span>кошка</span><strong>0</strong><span class="match-intro-distance">Победа!</span></li>
+                            <li class="match-intro-warm"><span>собака</span><strong>500</strong><span class="match-intro-distance">Ближе</span></li>
+                            <li class="match-intro-cold"><span>самолёт</span><strong>12000</strong><span class="match-intro-distance">Далеко</span></li>
+                        </ol>
+                    </figure>
+                    <p class="match-intro-goal"><span aria-hidden="true">↳</span> @(Multiplayer ? "Угадайте первым, чтобы выиграть раунд." : "Найдите ответ — ранг 0 означает победу.")</p>
+                </section>
+
+@code {
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public bool Multiplayer { get; set; } = true;
+    [Parameter] public string TitleId { get; set; } = "how-to-play-title";
+}

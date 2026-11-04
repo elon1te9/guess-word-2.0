@@ -1,0 +1,27 @@
+**/bin/
+**/obj/
+.*/
+publish/
+.github/
+src/GuessWord.Api/Resources/Data/
+
+**/appsettings.Development.json
+.env
+.env.*
+artifacts/
+
+# В runtime-образе не нужны тесты, инструменты и рабочие документы.
+tests/
+tools/
+docs/
+**/__pycache__/
+**/TestResults/
+**/*.vec
+**/*.dump
+**/*.backup
+**/secrets.json
+
+# Сертификаты и приватные ключи хранятся вне проекта
+*.pem
+*.key
+*.pfx

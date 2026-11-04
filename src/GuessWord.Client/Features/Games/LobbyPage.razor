@@ -1,0 +1,149 @@
+@using GuessWord.Client.Components.UI
+@page "/game"
+@implements IDisposable
+@using GuessWord.Contracts.Enums
+@using GuessWord.Contracts.Responses
+@inject NavigationManager Navigation
+@inject GuessWord.Client.State.UserStateService UserState
+@inject GuessWord.Client.Infrastructure.Http.GameService GameService
+@inject GuessWord.Client.Infrastructure.Http.RoomService RoomService
+
+<PageTitle>Игровое лобби</PageTitle>
+
+<div class="game-page">
+    @if (isLoading)
+    {
+        <section class="game-card game-empty-card">
+            <h1 class="game-title">Игровое лобби</h1>
+            <p class="game-message">Загрузка...</p>
+        </section>
+    }
+    else if (!UserState.IsAuthorized)
+    {
+        <section class="game-card game-empty-card">
+            <h1 class="game-title">Игровое лобби</h1>
+            <p class="game-message">Войдите в аккаунт, чтобы начать игру.</p>
+            <button class="game-login-button" @onclick="NavigateToLogin" type="button">Войти</button>
+        </section>
+    }
+    else
+    {
+        <section class="game-card game-header">
+            <h1 class="game-title">Игровое лобби</h1>
+            <p class="game-subtitle">Выбери режим и начни новый раунд</p>
+        </section>
+
+        @if (activeGame is not null)
+        {
+            <section class="game-card game-active-card">
+                <h2 class="game-active-title">У тебя уже есть активная игра</h2>
+                <p class="game-active-text">Заверши текущую игру, чтобы начать новую.</p>
+
+                <div class="game-active-actions">
+                    <button class="game-button game-button-dark" @onclick="ConnectToActiveGameAsync" type="button">
+                        Подключиться к активной игре
+                    </button>
+                </div>
+            </section>
+        }
+
+        <div class="game-modes-grid">
+            <section class="game-card game-mode-card">
+                <h2 class="game-mode-title">Одиночная игра</h2>
+                <p class="game-mode-text">
+                    Угадывай секретное слово по рангам и улучшай результат с каждой попыткой.
+                </p>
+
+                <div class="game-actions">
+                    <button class="game-button game-button-dark"
+                            @onclick="StartSingleGameAsync"
+                            disabled="@(isActionLoading || HasActiveGame)"
+                            type="button">
+                        @(isActionLoading ? "Запуск..." : "Начать игру")
+                    </button>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(errorMessage))
+                {
+                    <p class="game-message">@errorMessage</p>
+                }
+            </section>
+
+            <section class="game-card game-mode-card game-mode-card-accent">
+                <h2 class="game-mode-title">Игра 2–5 игроков</h2>
+                <p class="game-mode-text">
+                    Соревнуйся с друзьями в общем раунде.
+                </p>
+
+                <div class="game-actions">
+                    <button class="game-button game-button-light"
+                            @onclick="CreateRoomAsync"
+                            disabled="@(isCreatingRoom || HasActiveGame)"
+                            type="button">
+                        @(isCreatingRoom ? "Создание..." : "Создать комнату")
+                    </button>
+
+                    <button class="game-button game-button-light"
+                            @onclick="OpenJoinRoomModal"
+                            disabled="@(isJoiningRoom || HasActiveGame)"
+                            type="button">
+                        Присоединиться
+                    </button>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(roomError))
+                {
+                    <div class="error-message game-message">@roomError</div>
+                }
+            </section>
+        </div>
+
+        <section class="game-card game-next-card">
+            <h2 class="game-next-title">Что дальше?</h2>
+
+            <ul class="game-next-list">
+                <li>Начни одиночную игру</li>
+                <li>Подбирай слова по рангу</li>
+                <li>После завершения результат появится в истории</li>
+            </ul>
+        </section>
+    }
+</div>
+
+@if (isJoinRoomModalOpen)
+{
+    <AppDialog TitleId="join-room-title" CloseLabel="Закрыть подключение" Closed="CloseJoinRoomModal" PreventClose="isJoiningRoom">
+        <form class="game-join-modal" @onsubmit="JoinRoomAsync" @onsubmit:preventDefault="true">
+            <h2 id="join-room-title" class="game-join-modal-title">Подключиться к комнате</h2>
+            <p class="game-join-modal-text">Введи код комнаты, чтобы присоединиться к матчу.</p>
+
+            <div class="game-join-modal-form">
+                <input id="join-room-code" class="single-game-input" aria-label="Код комнаты"
+                       @bind="joinRoomCode"
+                       @bind:event="oninput"
+                       disabled="@isJoiningRoom"
+                       placeholder="Код комнаты" />
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(joinRoomModalError))
+            {
+                <p class="game-join-modal-message">@joinRoomModalError</p>
+            }
+
+            <div class="single-game-result-actions game-join-modal-actions">
+                <button class="single-game-button single-game-button-light"
+                        @onclick="CloseJoinRoomModal"
+                        disabled="@isJoiningRoom"
+                        type="button">
+                    Отмена
+                </button>
+
+                <button class="single-game-button single-game-button-dark"
+                        disabled="@isJoiningRoom"
+                        type="submit">
+                    @(isJoiningRoom ? "Подключение..." : "Подключиться")
+                </button>
+            </div>
+        </form>
+    </AppDialog>
+}

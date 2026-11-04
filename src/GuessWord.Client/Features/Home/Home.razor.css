@@ -1,0 +1,13 @@
+.home-page { display: grid; gap: 24px; }
+.home-top-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: stretch; }
+.home-card { padding: 32px; border: 2px solid var(--ink); background: var(--paper); box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.home-game-label { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+.home-game-label span { display: grid; place-items: center; width: 36px; height: 36px; font-weight: 700; background: var(--yellow); border: 2px solid var(--ink); }
+.home-title { font-size: 48px; line-height: 1.15; max-width: none; }
+.home-description { color: var(--muted); margin: 24px 0; max-width: 36ch; }
+.home-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.home-button-dark { background: var(--green); }
+.home-side-text { margin-top: 24px; color: var(--muted); }
+.home-links { display: flex; flex-wrap: wrap; gap: 12px; }
+@media (max-width: 950px) { .home-top-grid { grid-template-columns: minmax(0, 1fr); } .home-title { max-width: 18ch; } }
+@media (max-width: 560px) { .home-card { padding: 24px 18px; } .home-title { font-size: 36px; } .home-actions { flex-direction: column; } }

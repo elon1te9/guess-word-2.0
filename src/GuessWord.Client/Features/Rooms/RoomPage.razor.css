@@ -1,0 +1,32 @@
+.room-header-card { container: room-header / inline-size; }
+.room-header-layout { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 20px 24px; }
+.room-header-main { min-width: 0; }
+.room-header-side { justify-self: end; }
+.room-header-actions button { white-space: nowrap; }
+.room-action-label-short { display: none; }
+.room-code-row { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 12px; margin-top: 20px; }
+.room-code { width: 8ch; height: 44px; padding: 0 8px; background: #fff4cb; font-weight: 700; text-align: center; }
+.room-copy-message { color: var(--muted); overflow-wrap: anywhere; }
+.room-header-actions { display: flex; gap: 12px; flex-wrap: nowrap; justify-content: end; }
+.room-players-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+.room-player-card { min-width: 0; background: #fff4cb; padding: 16px; border: 2px solid var(--ink); }
+.room-invite-button { align-self: center; justify-self: start; width: 52px; height: 52px; padding: 0; font-size: 32px; line-height: 1; background: #fff4cb; }
+.room-player-label { color: var(--muted); margin-bottom: 8px; }
+.room-player-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.room-guide-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.room-status-pill { background: var(--yellow); padding: 4px 12px; }
+.room-guide-list { padding-left: 24px; margin: 16px 0 0; }
+@media (max-width: 950px) { .room-players-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .room-guide-header { align-items: start; flex-direction: column; } .room-player-card { padding: 12px; } }
+
+@container room-header (max-width: 680px) {
+    .room-header-layout { column-gap: 16px; }
+    .room-header-actions { gap: 8px; }
+    .room-action-label-full { display: none; }
+    .room-action-label-short { display: inline; }
+}
+@container room-header (max-width: 460px) {
+    .room-header-layout { grid-template-columns: minmax(0, 1fr); }
+    .room-header-side { justify-self: start; }
+    .room-header-actions { justify-content: flex-start; }
+}

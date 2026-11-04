@@ -1,0 +1,36 @@
+@page "/"
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject GuessWord.Client.State.UserStateService UserState
+@using GuessWord.Client.Components.Game
+
+<PageTitle>GuessWord</PageTitle>
+
+<div class="home-page">
+    <div class="home-top-grid">
+        <section class="home-card home-card-primary">
+            <div class="home-game-label">
+                <span aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" shape-rendering="crispEdges">
+                        <path fill-rule="evenodd" d="M4 10h8v2h2v8h-2v2H4v-2H2v-8h2zm1 3v6h6v-6z" />
+                        <path fill-rule="evenodd" d="M12 2h8v2h2v8h-2v2h-8v-2h-2V4h2zm1 3v6h6V5z" />
+                    </svg>
+                </span>
+                Игра в ассоциации
+            </div>
+            <h1 class="home-title">Каждое слово — ближе.</h1>
+            <p class="home-description">Одно загаданное слово. Тысячи вариантов. Найдите ответ по смыслу — самостоятельно или раньше друзей.</p>
+            <div class="home-actions">
+                <button class="home-button home-button-dark" @onclick="NavigateToPrimaryAction" type="button">@PrimaryActionText</button>
+                <button class="home-button home-button-light" @onclick="NavigateToSecondaryAction" type="button">@SecondaryActionText</button>
+            </div>
+            <p class="home-side-text">@QuickStartText</p>
+        </section>
+        <HowToPlay TitleId="home-how-to-play" Class="home-how-to-play" />
+    </div>
+    <nav class="home-links" aria-label="Другие разделы">
+        <button class="home-pill-link" @onclick="NavigateToProfile" type="button">Профиль</button>
+        <button class="home-pill-link" @onclick='() => NavigateTo("/leaderboard")' type="button">Таблица лидеров</button>
+        <button class="home-pill-link" @onclick="NavigateToHistory" type="button">История матчей</button>
+    </nav>
+</div>

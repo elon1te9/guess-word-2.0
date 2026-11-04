@@ -1,0 +1,4 @@
+.single-workspace { grid-template-columns: minmax(0, 1fr); }
+.single-workspace > .single-game-header { grid-column: 1; grid-row: 1; }
+.single-workspace > .single-game-attempts-card { grid-column: 1; grid-row: 2; }
+.single-player-count { grid-column: 3; }

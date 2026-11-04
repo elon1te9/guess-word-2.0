@@ -1,0 +1,31 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<dialog class="single-game-result-modal match-preview" @ref="dialogRef" aria-labelledby="@TitleId" @onclose="Closed" @oncancel:preventDefault="PreventClose">
+    @ChildContent
+    <form method="dialog"><button class="match-close" aria-label="@CloseLabel" disabled="@PreventClose" type="submit">×</button></form>
+</dialog>
+
+@code {
+    [Parameter, EditorRequired] public string TitleId { get; set; } = string.Empty;
+    [Parameter] public string CloseLabel { get; set; } = "Закрыть окно";
+    [Parameter] public bool PreventClose { get; set; }
+    [Parameter] public ElementReference ReturnFocus { get; set; }
+    [Parameter] public string? ReturnFocusSelector { get; set; }
+    [Parameter] public EventCallback Closed { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    private ElementReference dialogRef;
+    private IJSObjectReference? module;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/match-result-dialog.js");
+        await module.InvokeVoidAsync("show", dialogRef, ReturnFocus, ReturnFocusSelector);
+    }
+    public async ValueTask DisposeAsync()
+    {
+        if (module is null) return;
+        await module.InvokeVoidAsync("close", dialogRef);
+        await module.DisposeAsync();
+    }
+}

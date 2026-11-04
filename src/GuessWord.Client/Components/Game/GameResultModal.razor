@@ -1,0 +1,42 @@
+@using GuessWord.Contracts.Enums
+@using GuessWord.Contracts.Responses
+@using GuessWord.Client.Components.UI
+
+<AppDialog TitleId="single-result-title" CloseLabel="Закрыть результат" ReturnFocusSelector="#single-game-heading" Closed="OnDismiss" PreventClose="IsStartingGame">
+    <GameResultContent IsWinner="@(CurrentGame.PlayerResult == GamePlayerResult.Won)" IsSurrendered="@(CurrentGame.PlayerResult == GamePlayerResult.GaveUp)" TitleId="single-result-title" SecretWord="@CurrentGame.SecretWord" AttemptsCount="CurrentGame.AttemptsCount" Result="@GetResultValue()" />
+    @if (!string.IsNullOrWhiteSpace(Message))
+    {
+        <p class="single-game-message" role="alert">@Message</p>
+    }
+    <div class="single-game-result-actions">
+        <button class="single-game-button single-game-button-dark" @onclick="OnStartNewGame" disabled="@IsStartingGame" type="button">@(IsStartingGame ? "Запуск..." : "Новая игра")</button>
+        <button class="single-game-button single-game-button-light" @onclick="OnNavigateToLobby" type="button">В лобби</button>
+    </div>
+</AppDialog>
+
+@code {
+    [Parameter, EditorRequired]
+    public SingleGameResponseDto CurrentGame { get; set; } = null!;
+
+    [Parameter]
+    public bool IsStartingGame { get; set; }
+
+    [Parameter]
+    public EventCallback OnStartNewGame { get; set; }
+
+    [Parameter]
+    public EventCallback OnNavigateToLobby { get; set; }
+
+    [Parameter] public EventCallback OnDismiss { get; set; }
+    [Parameter] public string? Message { get; set; }
+
+    private string GetResultValue()
+    {
+        return CurrentGame.PlayerResult switch
+        {
+            GamePlayerResult.Won => "Победа",
+            GamePlayerResult.GaveUp => "Поражение",
+            _ => "Завершена"
+        };
+    }
+}

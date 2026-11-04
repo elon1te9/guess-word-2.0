@@ -1,0 +1,12 @@
+@implements IDisposable
+@inject GuessWord.Client.State.UserStateService UserState
+
+<header class="match-navigation">
+        <a class="match-wordmark" href="/" aria-label="GuessWord"><span class="pixel-mark" aria-hidden="true"><span></span><span></span><span></span></span><span class="match-brand-name">GuessWord</span></a>
+        <nav aria-label="Основная навигация">
+            <NavLink href="/" class="match-nav-link" ActiveClass="match-nav-current" Match="NavLinkMatch.All">Главная</NavLink>
+            <NavLink href="/game" class="match-nav-link" ActiveClass="match-nav-current">Игра</NavLink>
+            <NavLink href="/leaderboard" class="match-nav-link" ActiveClass="match-nav-current">Рейтинг</NavLink>
+            <NavLink href="@(UserState.IsAuthorized ? "/profile" : "/login")" class="match-account" ActiveClass="match-nav-current" aria-label="@(UserState.IsAuthorized ? "Профиль" : "Войти")"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" shape-rendering="crispEdges"><path fill="currentColor" d="M5 1h6v2h2v6h-2v2H5V9H3V3h2zm1 2v6h4V3zM3 12h10v2h2v2H1v-2h2z" /></svg></NavLink>
+        </nav>
+    </header>

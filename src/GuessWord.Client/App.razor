@@ -1,0 +1,35 @@
+@inject GuessWord.Client.Infrastructure.Http.AuthService AuthService
+@inject GuessWord.Client.State.UserStateService UserState
+
+@if (!UserState.IsInitialized)
+{
+    <LayoutView Layout="@typeof(MainLayout)">
+        <p>Загрузка...</p>
+    </LayoutView>
+}
+else
+{
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <section class="game-card game-empty-card">
+                    <h1>Страница не найдена</h1>
+                    <p class="game-subtitle">Проверьте адрес или вернитесь на главную, чтобы продолжить игру.</p>
+                    <p class="game-actions"><a class="ui-button" href="/">На главную</a></p>
+                </section>
+            </LayoutView>
+        </NotFound>
+    </Router>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.RestoreUser();
+    }
+}

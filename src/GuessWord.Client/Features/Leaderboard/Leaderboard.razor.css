@@ -1,0 +1,21 @@
+.leaderboard-page { display: grid; gap: 24px; }
+.leaderboard-card { min-width: 0; border: 2px solid var(--ink); background: var(--paper); box-shadow: 4px 4px 0 var(--ink); padding: 24px; }
+.leaderboard-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .55fr); gap: 32px; }
+.leaderboard-subtitle, .leaderboard-state-text { color: var(--muted); }
+.leaderboard-summary { display: grid; gap: 16px; }
+.leaderboard-summary-pill { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.leaderboard-summary-label { color: var(--muted); }
+.leaderboard-summary-value { font-weight: 700; overflow-wrap: anywhere; }
+.leaderboard-table-card { padding: 0; }
+.leaderboard-table-header, .leaderboard-row { display: grid; grid-template-columns: .6fr minmax(0, 2.6fr) 1fr 1fr 1fr; gap: 16px; align-items: center; padding: 16px 20px; }
+.leaderboard-table-header { background: var(--yellow); border-bottom: 2px solid var(--ink); font-weight: 600; }
+.leaderboard-row + .leaderboard-row { border-top: 1px solid var(--line); }
+.leaderboard-row > div { min-width: 0; overflow-wrap: anywhere; }
+.leaderboard-row-current-user { background: #e1f5e5; box-shadow: inset 4px 0 var(--green); }
+.leaderboard-row-player { font-weight: 600; }
+@media (max-width: 950px) { .leaderboard-hero { grid-template-columns: minmax(0, 1fr); gap: 16px; } }
+@media (max-width: 560px) { .leaderboard-card { padding: 20px 18px; } .leaderboard-table-card { padding: 0; } .leaderboard-table-header { display: none; } .leaderboard-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px; } .leaderboard-row-place { grid-column: 1; } .leaderboard-row-player { grid-column: 2 / 4; } .leaderboard-row > div::before { content: attr(data-label); display: block; color: var(--muted); font-weight: 400; margin-bottom: 4px; } }
+.leaderboard-summary-pill-light { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+.leaderboard-summary-label, .leaderboard-summary-value { min-width: 0; overflow-wrap: anywhere; }
+
+.leaderboard-state-text:first-child { margin-top: 0; }

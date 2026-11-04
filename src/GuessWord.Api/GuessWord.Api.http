@@ -1,0 +1,33 @@
+@GuessWord.Api_HostAddress = http://localhost:5280
+
+### Использовать локальный токен своего тестового аккаунта
+# @token задаётся локально; не сохранять JWT в репозитории.
+@gameId = 1
+
+### Нормализация и повтор: вторая отправка не увеличивает счётчик
+POST {{GuessWord.Api_HostAddress}}/api/Game/single/guess
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"gameId": {{gameId}}, "word": "  ЁЖ  "}
+
+### Приватное состояние: слова только автора запроса, сводки остальных
+GET {{GuessWord.Api_HostAddress}}/api/games/{{gameId}}
+Authorization: Bearer {{token}}
+
+### После завершения: 409 application/problem+json с code=game_finished
+POST {{GuessWord.Api_HostAddress}}/api/Game/multiplayer/guess
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"gameId": {{gameId}}, "word": "еж"}
+
+### Процесс
+GET http://localhost:5280/health/live
+
+### БД и полный словарь (503 при неполной готовности)
+GET http://localhost:5280/health/ready
+
+### Текущее лобби: 200 со снимком; 404 после явного выхода
+GET {{GuessWord.Api_HostAddress}}/api/room/current
+Authorization: Bearer {{token}}

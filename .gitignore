@@ -1,0 +1,98 @@
+# Публичный состав корня. Новый файл или каталог здесь нужно разрешить явно.
+/*
+!/.gitignore
+!/.gitattributes
+!/.dockerignore
+!/.config/
+!/global.json
+!/GuessWord.slnx
+!/README.md
+!/src/
+!/tools/
+!/docs/
+!/deploy/
+
+# В публичной документации остаются архитектура и запуск.
+/docs/design/
+/docs/testing/
+
+# Воспроизводимая конфигурация инструментов .NET.
+/.config/*
+!/.config/dotnet-tools.json
+
+# Результаты сборки, публикации, тестов и локальные зависимости.
+bin/
+obj/
+out/
+artifacts/
+publish/
+TestResults/
+coverage/
+playwright-report/
+test-results/
+node_modules/
+wwwroot/_framework/
+wwwroot/dist/
+*.nupkg
+*.snupkg
+*.trx
+*.coverage
+*.coveragexml
+
+# Из артефактов публикуются только снимки интерфейса.
+!/artifacts/
+/artifacts/*
+!/artifacts/screenshots/
+
+# Настройки разработчика, редакторов и операционной системы.
+.vs/
+.vscode/
+.idea/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+*.sln.iml
+*.VC.db
+*.VC.opendb
+.DS_Store
+Thumbs.db
+*~
+
+# Локальное окружение и секреты. В репозитории остаются только примеры.
+.env
+.env.*
+secrets.json
+appsettings.Development.json
+appsettings.Local.json
+!/.env.example
+!/src/GuessWord.Client/wwwroot/appsettings.Development.json
+
+# Ключи, сертификаты и резервные копии не публикуются.
+*.pem
+*.key
+*.pfx
+*.p12
+*.crt
+*.cer
+*.dump
+*.backup
+*.bak
+*.pgpass
+
+# Векторы и промежуточные результаты подготовки словаря.
+*.vec
+/src/GuessWord.Api/Resources/Data/
+/src/GuessWord.Api/Resources/secret-words-quality-report.tsv
+/src/GuessWord.Api/Resources/all-words-prune-candidates.tsv
+
+# Журналы, временные файлы и Python-кэш.
+*.log
+*.cache
+*.tmp
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/

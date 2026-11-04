@@ -1,0 +1,72 @@
+/* Borrowed from the reference: dark game bar, paper grid, ink outlines and offset edges.
+   The pink field is replaced with a quiet sage ground; actual words keep their own palette. */
+.match-shell {
+    --glass-ground: #eef4e8;
+    --glass-ink: #1f2b22;
+    --glass-muted: #465348;
+    --glass-radius: 0;
+    --glass-surface: #ffffff;
+    --glass-shadow: none;
+    --glass-green: #58c878;
+    --glass-yellow: #f2c84b;
+    --glass-red: #ec6865;
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+    color: var(--glass-ink);
+    padding: 20px 24px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.match-shell::before {
+    content: "";
+    position: fixed;
+    inset: -64px;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--glass-ground) url('/images/arcade-grid.svg') repeat;
+    animation: background-drift 6s linear infinite;
+}
+@keyframes background-drift {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(32px, 32px, 0); }
+}
+
+.match-navigation, .match-canvas, .match-footer { width: min(1100px, 100%); margin: 0 auto; }
+.match-navigation { display: flex; justify-content: space-between; align-items: center; gap: 24px; min-height: 68px; padding: 10px 20px; border: 2px solid var(--glass-ink); border-radius: var(--glass-radius); color: white; background: var(--glass-ink); box-shadow: 4px 4px 0 #172019; }
+.match-wordmark { display: inline-flex; align-items: center; gap: 12px; font-family: 'Epilepsy Sans', monospace; font-size: 36px; line-height: 1; }
+.match-navigation nav { display: flex; align-items: center; gap: 8px; }
+.match-nav-link, .match-account { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0 16px; border-radius: var(--glass-radius); font-size: 20px; font-weight: 500; color: #e5eedf; transition: background-color 160ms, color 160ms; }
+.match-nav-link:hover, .match-account:hover { color: white; background: #3d4c40; }
+.match-nav-current { color: var(--glass-ink); background: var(--glass-green); }
+.match-nav-current:hover { color: var(--glass-ink); background: #73d38d; }
+.match-account { width: 44px; padding: 0; }
+.match-canvas { flex: 1; padding: 32px 0 36px; }
+.match-footer { display: flex; justify-content: space-between; gap: 16px; padding: 24px 0; font-size: 20px; font-weight: 500; color: var(--glass-ink); }
+.match-footer-motto { text-align: right; }
+.match-navigation :focus-visible { outline: 3px solid var(--glass-yellow); outline-offset: 3px; }
+.pixel-mark { display: grid; gap: 3px; width: 17px; }
+.pixel-mark span { display: block; height: 4px; }
+.pixel-mark span:nth-child(1) { width: 9px; background: var(--glass-red); }
+.pixel-mark span:nth-child(2) { width: 13px; background: var(--glass-yellow); }
+.pixel-mark span:nth-child(3) { width: 17px; background: var(--glass-green); }
+@media (max-width: 700px) {
+    .match-shell { padding: 16px 18px 0; }
+    .match-navigation { display: grid; grid-template-columns: 24px minmax(0, 1fr); min-height: 60px; padding: 6px 10px; gap: 4px; }
+    .match-wordmark { width: 24px; min-height: 44px; justify-content: center; }
+    .match-brand-name { display: none; }
+    .pixel-mark { width: 13px; }
+    .pixel-mark span:nth-child(3) { width: 13px; }
+    .pixel-mark span:nth-child(2) { width: 10px; }
+    .pixel-mark span:nth-child(1) { width: 7px; }
+    .match-navigation nav { justify-content: flex-end; gap: 2px; }
+    .match-nav-link { padding: 0 6px; font-size: 20px; }
+    .match-account { width: 32px; }
+    .match-canvas { padding: 24px 0; }
+    .match-footer { font-size: 20px; padding: 20px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .match-nav-link, .match-account { transition: none; }
+    .match-shell::before { animation: none; }
+}

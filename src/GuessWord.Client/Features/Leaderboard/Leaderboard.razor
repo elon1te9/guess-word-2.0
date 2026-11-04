@@ -1,0 +1,79 @@
+@page "/leaderboard"
+@implements IDisposable
+@using GuessWord.Contracts.Responses
+@inject GuessWord.Client.State.UserStateService UserState
+@inject GuessWord.Client.Infrastructure.Http.UserService UserService
+
+<PageTitle>Таблица лидеров</PageTitle>
+
+<div class="leaderboard-page">
+    <section class="leaderboard-card leaderboard-hero">
+        <div class="leaderboard-hero-main">
+            <h1 class="leaderboard-title">Таблица лидеров</h1>
+            <p class="leaderboard-subtitle">
+                Лучшие игроки GuessWord за всё время. Побеждай чаще, поднимайся выше и закрепляйся в топе.
+            </p>
+        </div>
+
+        <div class="leaderboard-summary">
+            <div class="leaderboard-summary-pill">
+                <span class="leaderboard-summary-label">Игроков в рейтинге</span>
+                <span class="leaderboard-summary-value">@TotalPlayersLabel</span>
+            </div>
+
+            <div class="leaderboard-summary-pill leaderboard-summary-pill-light">
+                <span class="leaderboard-summary-label">Лидер по победам</span>
+                <span class="leaderboard-summary-value">@LeaderLabel</span>
+            </div>
+        </div>
+    </section>
+
+    @if (_isLoading)
+    {
+        <section class="leaderboard-card leaderboard-state-card">
+            <p class="leaderboard-state-text">Загрузка таблицы лидеров...</p>
+        </section>
+    }
+    else if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <section class="leaderboard-card leaderboard-state-card">
+            <p class="leaderboard-state-text">@_errorMessage</p>
+        </section>
+    }
+    else if (_leaderboard?.Entries.Count is not > 0)
+    {
+        <section class="leaderboard-card leaderboard-state-card">
+            <h2 class="leaderboard-state-title">Пока нет завершённых игр для рейтинга</h2>
+            <p class="leaderboard-state-text">Как только появятся первые завершённые матчи, здесь сформируется общий топ игроков.</p>
+        </section>
+    }
+    else
+    {
+        <section class="leaderboard-card leaderboard-table-card">
+            <div class="leaderboard-table-wrap">
+                <div class="leaderboard-table">
+                    <div class="leaderboard-table-header">
+                        <div>Место</div>
+                        <div>Игрок</div>
+                        <div>Победы</div>
+                        <div>Игр</div>
+                        <div>Победы, %</div>
+                    </div>
+
+                    <div class="leaderboard-table-body">
+                        @foreach (var entry in _leaderboard!.Entries)
+                        {
+                            <div class="@GetRowClass(entry)">
+                                <div class="leaderboard-row-place" data-label="Место">@entry.Place</div>
+                                <div class="leaderboard-row-player" data-label="Игрок">@entry.DisplayName</div>
+                                <div data-label="Победы">@entry.WinsCount</div>
+                                <div data-label="Игр">@entry.GamesCount</div>
+                                <div data-label="Победы, %">@entry.WinRate%</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+</div>

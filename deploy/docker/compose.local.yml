@@ -1,0 +1,44 @@
+# Из корня: docker compose --env-file .env -f deploy/docker/compose.local.yml up --build
+# Отдельное имя/volume; БД и API не публикуют порты хоста.
+name: guessword-local-release
+services:
+  db:
+    image: pgvector/pgvector:pg16-bookworm
+    environment:
+      POSTGRES_DB: guessword_local
+      POSTGRES_USER: guessword_local
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Задайте POSTGRES_PASSWORD в локальном .env}
+    volumes:
+      - local-release-data:/var/lib/postgresql/data
+      - ../postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U guessword_local -d guessword_local']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Host=db;Database=guessword_local;Username=guessword_local;Password=${POSTGRES_PASSWORD}
+      Jwt__Key: ${JWT_KEY:?Задайте JWT_KEY длиной не менее 32 символов}
+    volumes:
+      - ../../src/GuessWord.Api/Resources/Data/sociation2vec800.vec:/app/Resources/Data/sociation2vec800.vec:ro
+  nginx:
+    image: nginx:alpine
+    depends_on:
+      - api
+    ports:
+      - '127.0.0.1:${GUESSWORD_LOCAL_PORT:-8088}:80'
+    volumes:
+      - ../nginx/security.conf:/etc/nginx/guessword/security.conf:ro
+      - ../nginx/locations.conf:/etc/nginx/guessword/locations.conf:ro
+      - ../nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../../artifacts/release/client/wwwroot:/usr/share/nginx/html:ro
+volumes:
+  local-release-data:

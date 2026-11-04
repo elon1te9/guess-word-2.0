@@ -1,0 +1,114 @@
+@page "/game/room/{Code}"
+@implements IAsyncDisposable
+@using GuessWord.Contracts.Enums
+@using GuessWord.Contracts.Responses
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.SignalR.Client
+@inject Microsoft.JSInterop.IJSRuntime JS
+@inject NavigationManager Navigation
+@inject GuessWord.Client.State.UserStateService UserState
+@inject GuessWord.Client.Infrastructure.Http.RoomService RoomService
+@inject GuessWord.Client.Infrastructure.Http.GameService GameService
+@inject GuessWord.Client.Infrastructure.Realtime.GameHubConnectionFactory HubConnections
+
+<PageTitle>Игровая комната</PageTitle>
+
+<div class="game-page">
+    @if (isLoading)
+    {
+        <section class="game-card game-empty-card">
+            <h1 class="game-title">Игровая комната</h1>
+            <p class="game-message">Загрузка комнаты...</p>
+        </section>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <section class="game-card game-header">
+            <h1 class="game-title">Игровая комната</h1>
+            <p class="game-message">@errorMessage</p>
+            <button class="game-button game-button-light" @onclick="NavigateToLobby" type="button">
+                Назад в лобби
+            </button>
+        </section>
+    }
+    else if (room is not null)
+    {
+        <section class="game-card game-header room-header-card">
+            <div class="room-header-layout">
+                <div class="room-header-main">
+                    <h1 class="game-title">Игровая комната</h1>
+                </div>
+
+                <div class="room-header-side">
+                    <div class="room-actions room-header-actions">
+                        @if (room.IsHost)
+                        {
+                            <button class="game-button game-button-dark"
+                                    @onclick="StartMultiplayerGameAsync"
+                                    disabled="@(!room.CanStartGame || isStartingGame)"
+                                    type="button" aria-label="@(isStartingGame ? "Запуск..." : "Начать игру")">
+                                <span class="room-action-label-full">@(isStartingGame ? "Запуск..." : "Начать игру")</span>
+                                <span class="room-action-label-short" aria-hidden="true">@(isStartingGame ? "Запуск..." : "Начать")</span>
+                            </button>
+                        }
+
+                        <button class="game-button game-button-light"
+                                @onclick="LeaveRoomAsync"
+                                disabled="@isLeaving"
+                                type="button" aria-label="@(isLeaving ? "Выход..." : "Выйти из комнаты")">
+                            <span class="room-action-label-full">@(isLeaving ? "Выход..." : "Выйти из комнаты")</span>
+                            <span class="room-action-label-short" aria-hidden="true">@(isLeaving ? "Выход..." : "Выйти")</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="room-code-row">
+                <label for="room-code">Код комнаты:</label>
+                <input id="room-code" class="room-code" value="@room.Code" readonly />
+                <button class="game-button game-button-light" @onclick="CopyCodeAsync" type="button">Копировать код</button>
+                <span class="room-copy-message" role="status">@copyMessage</span>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(signalRErrorMessage))
+            {
+                <p class="game-message">@signalRErrorMessage</p>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(startGameError))
+            {
+                <p class="game-message">@startGameError</p>
+            }
+        </section>
+
+        <section class="game-card room-section">
+            <div class="room-players-grid">
+                @{ var participantNumber = 0; }
+                @foreach (var player in room.Players.OrderByDescending(player => player.IsHost))
+                {
+                    <div class="room-player-card" @key="player.UserId">
+                        <div class="room-player-label">@(player.IsHost ? "Создатель" : $"Участник {++participantNumber}")</div>
+                        <div class="room-player-name">@player.Name</div>
+                    </div>
+                }
+                @if (!room.IsFull && room.Players.Count < 5)
+                {
+                    <button class="room-invite-button" @onclick="CopyCodeAsync" type="button" aria-label="Пригласить участника: скопировать код комнаты" title="Копировать код комнаты">+</button>
+                }
+            </div>
+        </section>
+
+        <section class="game-card room-section room-guide-card">
+            <div class="room-guide-header">
+                <h2 class="room-guide-title">Как начать матч</h2>
+                <div class="room-status-pill">@GetRoomStatusText(room.Status)</div>
+            </div>
+
+            <ul class="room-guide-list">
+                <li>Поделись кодом комнаты с друзьями.</li>
+                <li>В комнате могут играть от двух до пяти участников.</li>
+                <li>Хозяин может начать, когда в комнате есть хотя бы два игрока.</li>
+            </ul>
+        </section>
+    }
+</div>

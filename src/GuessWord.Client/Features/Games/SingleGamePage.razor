@@ -1,0 +1,130 @@
+@page "/game/single"
+@implements IDisposable
+@using Microsoft.AspNetCore.Components
+@using GuessWord.Client.Components.Game
+@using GuessWord.Client.Features.Games
+@using GuessWord.Contracts.Enums
+@using GuessWord.Contracts.Responses
+@inject NavigationManager Navigation
+@inject GuessWord.Client.State.UserStateService UserState
+@inject GuessWord.Client.Infrastructure.Http.GameService GameService
+
+<PageTitle>Одиночная игра</PageTitle>
+
+<div class="single-game-page match-preview single-mode">
+    @if (isLoading)
+    {
+        <section class="single-game-card single-game-empty-card">
+            <h1 id="single-game-heading" class="single-game-title" tabindex="-1">Одиночная игра</h1>
+            <p class="single-game-message">Загрузка...</p>
+        </section>
+    }
+    else if (!UserState.IsAuthorized)
+    {
+        <section class="single-game-card single-game-empty-card">
+            <h1 id="single-game-heading" class="single-game-title" tabindex="-1">Одиночная игра</h1>
+            <p class="single-game-message">Войдите в аккаунт, чтобы играть.</p>
+            <button class="single-game-button single-game-button-light" @onclick="NavigateToLogin" type="button">
+                Войти
+            </button>
+        </section>
+    }
+    else if (currentGame is null)
+    {
+        <section class="single-game-card single-game-empty-card">
+            <h1 class="single-game-title">Нет активной игры</h1>
+            <p class="single-game-message">Начните новую одиночную игру.</p>
+
+            <button class="single-game-button single-game-button-dark"
+                    @onclick="StartNewGameAsync"
+                    disabled="@isStartingGame"
+                    type="button">
+                @(isStartingGame ? "Запуск..." : "Начать игру")
+            </button>
+
+            @if (!string.IsNullOrWhiteSpace(pageMessage))
+            {
+                <p class="single-game-message">@pageMessage</p>
+            }
+        </section>
+    }
+    else
+    {
+        <header class="match-title-row">
+            <h1 id="single-game-heading" class="single-game-title" tabindex="-1">Одиночная игра</h1>
+            <div class="single-game-header-actions">
+                <button class="single-game-button single-game-button-danger single-game-button-steady"
+                        @onclick="GiveUpAsync"
+                        disabled="@(isSubmitting || currentGame.Status == GameStatus.Finished)"
+                        type="button">Сдаться</button>
+            </div>
+        </header>
+
+        <div class="match-window">
+            <div class="match-window-bar">
+                <span class="window-lights" aria-hidden="true"><span></span><span></span><span></span></span>
+                <span class="match-room-count single-player-count">1 игрок</span>
+            </div>
+            <div class="match-workspace single-workspace">
+                <section class="single-game-card single-game-header">
+                    <label class="match-input-label" for="single-guess">Ваше слово</label>
+                    <form class="single-game-form" @onsubmit="SubmitGuessAsync" @onsubmit:preventDefault="true">
+                        <input id="single-guess" class="single-game-input" autocomplete="off" spellcheck="false"
+                               @ref="guessInputRef"
+                               @bind="guessWord"
+                               @bind:event="oninput"
+                               disabled="@(isSubmitting || currentGame.Status == GameStatus.Finished)"
+                               placeholder="Введите слово" />
+
+                        <button class="single-game-button single-game-button-dark single-game-button-steady"
+                                disabled="@(isSubmitting || currentGame.Status == GameStatus.Finished)"
+                                type="submit">
+                            Проверить
+                        </button>
+                    </form>
+
+                    @if (!string.IsNullOrWhiteSpace(pageMessage) && (currentGame.Status != GameStatus.Finished || resultDismissed))
+                    {
+                        <p class="single-game-message">@pageMessage</p>
+                    }
+
+                </section>
+
+                <section class="single-game-card single-game-attempts-card">
+                    <div class="match-attempts-heading"><h2>Ваши попытки</h2><span>Всего: @currentGame.AttemptsCount</span></div>
+                    @if (currentGame.AttemptsCount == 0 && !showNotFoundCard)
+                    {
+                        <HowToPlay Multiplayer="false" />
+                    }
+                    @if (lastSubmittedAttempt is not null)
+                    {
+                        <AttemptCard @key="GetAttemptKey(lastSubmittedAttempt)"
+                                     Attempt="lastSubmittedAttempt"
+                                     IsFeatured="true"
+                                     IsActive="true" />
+                    }
+                    else if (showNotFoundCard)
+                    {
+                        <div class="single-game-word-not-found">
+                            такого слова не найдено
+                        </div>
+                    }
+
+                    @if (displayAttempts.Count > 0)
+                    {
+                        <AttemptList Attempts="displayAttempts"
+                                     />
+                    }
+                </section>
+            </div>
+        </div>
+    }
+</div>
+
+@if (currentGame is not null && currentGame.Status == GameStatus.Finished && !resultDismissed)
+{
+    <GameResultModal Message="@pageMessage" CurrentGame="currentGame" OnDismiss="() => resultDismissed = true"
+                     IsStartingGame="isStartingGame"
+                     OnStartNewGame="StartNewGameAsync"
+                     OnNavigateToLobby="NavigateToLobby" />
+}

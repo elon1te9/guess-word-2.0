@@ -1,0 +1,93 @@
+.single-game-word-row {
+    position: relative;
+    overflow: hidden;
+    min-height: 56px;
+    border-radius: 0;
+    background: var(--attempt-background, #eef3ea);
+    color: var(--attempt-text, #1f2b22);
+    border: none;
+    isolation: isolate;
+    box-shadow: var(--attempt-shadow, none);
+}
+
+.single-game-word-row-featured {
+    min-height: 62px;
+    margin-bottom: 48px;
+}
+
+.single-game-word-row-active {
+    box-shadow: var(--attempt-active-shadow, none);
+}
+
+.single-game-word-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--word-fill-width, 0%);
+    transition: width var(--match-motion, 0ms) ease-out;
+    border-radius: inherit;
+    z-index: 0;
+}
+
+.single-game-word-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-width: 0;
+    min-height: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 28px;
+}
+
+.single-game-word-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 20px;
+    line-height: 1.1;
+    color: var(--attempt-word-text, var(--attempt-text, #1f2b22));
+}
+
+.single-game-word-rank {
+    flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1.1;
+    color: var(--attempt-rank-text, var(--attempt-text, #1f2b22));
+    white-space: nowrap;
+}
+
+.single-game-attempt-hot .single-game-word-fill {
+    background: var(--attempt-hot, #58c878);
+}
+
+.single-game-attempt-warm .single-game-word-fill {
+    background: var(--attempt-warm, #f2c84b);
+}
+
+.single-game-attempt-medium .single-game-word-fill {
+    background: var(--attempt-medium, #f2c84b);
+}
+
+.single-game-attempt-cold .single-game-word-fill {
+    background: var(--attempt-cold, #ec6865);
+}
+
+.single-game-attempt-invalid .single-game-word-fill {
+    background: #8c95a8;
+}
+
+@media (max-width: 560px) {
+    .single-game-word-text {
+        font-size: 17px;
+    }
+
+    .single-game-word-rank {
+        font-size: 17px;
+    }
+
+}

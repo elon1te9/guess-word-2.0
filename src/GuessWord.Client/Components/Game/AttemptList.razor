@@ -1,0 +1,23 @@
+@using GuessWord.Contracts.Responses
+@using GuessWord.Client.Features.Games
+
+@if (Attempts.Count > 0)
+{
+    <div class="single-game-word-table">
+        @foreach (var attempt in Attempts)
+        {
+            <AttemptCard @key="GetAttemptKey(attempt)"
+                         Attempt="attempt" />
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public IReadOnlyList<GameAttemptResponseDto> Attempts { get; set; } = Array.Empty<GameAttemptResponseDto>();
+
+    private static string GetAttemptKey(GameAttemptResponseDto attempt)
+    {
+        return GameAttemptDisplayHelper.BuildAttemptKey(attempt);
+    }
+}

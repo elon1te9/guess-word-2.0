@@ -1,0 +1,42 @@
+@if (IsWinner)
+        {
+            <svg class="pixel-result-icon pixel-trophy" viewBox="0 0 24 24" aria-hidden="true" shape-rendering="crispEdges">
+                <path fill="#263e30" d="M5 1h14v2h4v9h-4v3h-4v3h3v3h3v3H3v-3h3v-3h3v-3H5v-3H1V3h4z" />
+                <path fill="#f2c84b" d="M7 3h10v10h-3v7h5v2H5v-2h5v-7H7zM3 5h2v5H3zm16 0h2v5h-2z" />
+                <path fill="#fff4bb" d="M9 5h2v5H9z" />
+            </svg>
+        }
+        else
+        {
+            <svg class="pixel-result-icon pixel-sad-face" viewBox="0 0 24 24" aria-hidden="true" shape-rendering="crispEdges">
+                <path fill="#f2c84b" d="M6 2h12v2h3v3h2v10h-2v3h-3v2H6v-2H3v-3H1V7h2V4h3z" />
+                <path fill="currentColor" d="M6 0h12v2H6zM3 2h3v2H3zm15 0h3v2h-3zM1 4h2v3H1zm20 0h2v3h-2zM0 7h2v10H0zm22 0h2v10h-2zM1 17h2v3H1zm20 0h2v3h-2zM3 20h3v2H3zm15 0h3v2h-3zM6 22h12v2H6zM6 7h3v4H6zm9 0h3v4h-3zM8 14h8v2H8zm-2 2h2v3H6zm10 0h2v3h-2z" />
+            </svg>
+        }
+        <h2 id="@TitleId" class="single-game-result-title">@(IsSurrendered ? "Вы сдались в этом раунде" : IsWinner ? "Вы победили в этом раунде" : "Вы проиграли в этом раунде")</h2>
+
+        <div class="single-game-result-secret @(IsWinner ? "" : "single-game-result-secret-lost")">
+            <div class="single-game-result-secret-label">Загаданное слово</div>
+            <div class="single-game-result-secret-word">@SecretWord</div>
+        </div>
+
+        <div class="single-game-result-stats">
+            <div class="single-game-result-stat">
+                <div class="single-game-result-stat-label">Попытки</div>
+                <div class="single-game-result-stat-value">@AttemptsCount</div>
+            </div>
+
+            <div class="single-game-result-stat">
+                <div class="single-game-result-stat-label">Результат</div>
+                <div class="single-game-result-stat-value">@Result</div>
+            </div>
+        </div>
+
+@code {
+    [Parameter] public bool IsWinner { get; set; }
+    [Parameter] public bool IsSurrendered { get; set; }
+    [Parameter] public string TitleId { get; set; } = "game-result-title";
+    [Parameter] public string? SecretWord { get; set; }
+    [Parameter] public int AttemptsCount { get; set; }
+    [Parameter] public string Result { get; set; } = string.Empty;
+}

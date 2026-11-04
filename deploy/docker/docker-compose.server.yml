@@ -1,0 +1,45 @@
+name: guess-word
+
+services:
+  db:
+    image: pgvector/pgvector:pg16-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Jwt__Key: ${JWT_KEY}
+    volumes:
+      - ../../src/GuessWord.Api/Resources/Data:/app/Resources/Data:ro
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ${GUESSWORD_TLS_DIRECTORY:?Укажите абсолютный путь к каталогу сертификата вне репозитория}:/etc/nginx/tls:ro
+      - ../nginx/security.conf:/etc/nginx/guessword/security.conf:ro
+      - ../nginx/locations.conf:/etc/nginx/guessword/locations.conf:ro
+      - ../nginx/nginx.server.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../../publish/client/wwwroot:/usr/share/nginx/html:ro
+
+volumes:
+  pgdata:

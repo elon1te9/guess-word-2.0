@@ -1,0 +1,88 @@
+/* Epilepsy Sans by Rebecca Bettencourt / Kreative Software; unmodified fonts.
+   See /fonts/EpilepsySans-LICENSE.txt for attribution and embedding terms. */
+@font-face {
+    font-family: 'Epilepsy Sans';
+    src: url('/fonts/EpilepsySans.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Epilepsy Sans';
+    src: url('/fonts/EpilepsySansBold.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 600 900;
+    font-display: swap;
+}
+
+:root {
+    --ink: #1f2b22; --muted: #465348; --ground: #eef4e8; --paper: #ffffff;
+    --green: #58c878; --yellow: #f2c84b; --red: #ec6865; --danger: #7b3c27;
+    --match-text: var(--ink); --match-muted: var(--muted); --line: #d2ddcc; --motion: 160ms;
+    --attempt-background: #eef3ea; --attempt-word-text: var(--ink); --attempt-rank-text: var(--ink);
+    --attempt-hot: var(--green); --attempt-warm: var(--yellow); --attempt-medium: var(--yellow); --attempt-cold: var(--red);
+    --attempt-shadow: none; --attempt-active-shadow: none; --match-motion: var(--motion);
+}
+* { box-sizing: border-box; border-radius: 0; }
+html, body { margin: 0; min-height: 100%; background: var(--ground); color: var(--ink); font-family: 'Epilepsy Sans', monospace; font-size: 20px; line-height: 1.5; }
+body { overflow-y: scroll; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+img, svg { max-width: 100%; }
+h1, h2, h3, p { overflow-wrap: anywhere; }
+h1 { margin: 0; font-size: 32px; line-height: 1.2; }
+h2 { margin: 0; font-size: 24px; line-height: 1.25; }
+h3 { margin: 0; font-size: 24px; line-height: 1.25; }
+p { margin: 12px 0 0; }
+h1[tabindex="-1"]:focus-visible { outline: none; }
+:focus-visible { outline: 3px solid #327345; outline-offset: 4px; }
+button, .ui-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 16px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); font-weight: 600; line-height: 1.2; box-shadow: 2px 2px 0 var(--ink); transition: transform var(--motion), background-color var(--motion); }
+button:hover, .ui-button:hover { background: #edf3e7; }
+button:active, .ui-button:active { transform: translate(2px, 2px); box-shadow: none; }
+button:disabled { opacity: 1; background: #e3e9de; color: #5c685d; border-color: #93a08f; box-shadow: none; cursor: not-allowed; transform: none; }
+input { width: 100%; min-width: 0; height: 52px; padding: 0 16px; border: 2px solid var(--ink); background: var(--paper); line-height: 1.2; }
+input::placeholder { color: var(--muted); opacity: 1; }
+input:disabled { background: #e3e9de; color: #5c685d; }
+#app { min-height: 100vh; }
+#blazor-error-ui { display: none; position: fixed; inset: auto 0 0; z-index: 1000; background: #fff4cb; color: var(--danger); border-top: 2px solid var(--ink); padding: 16px 48px 16px 16px; }
+#blazor-error-ui .reload { text-decoration: underline; margin-left: 8px; }
+#blazor-error-ui .dismiss { position: absolute; right: 16px; top: 12px; cursor: pointer; }
+.auth-page { display: grid; place-items: center; min-height: 65vh; }
+.auth-card { width: min(460px, 100%); border: 2px solid var(--ink); background: var(--paper); box-shadow: 6px 6px 0 var(--ink); padding: 32px; }
+.auth-title { font-size: 32px; margin: 0 0 24px; line-height: 1.2; }
+.auth-field { margin-bottom: 16px; }
+.auth-label { display: block; margin-bottom: 8px; font-weight: 600; }
+.auth-message { color: var(--danger); margin: 16px 0; }
+.auth-message:empty { display: none; }
+.auth-button { background: var(--green); width: 100%; min-height: 52px; margin: 0 0 24px; }
+.auth-footer-text { color: var(--muted); }
+.auth-footer-text a { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+.game-page { width: 100%; display: grid; gap: 24px; }
+.game-card { border: 2px solid var(--ink); background: var(--paper); padding: 24px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.game-title { margin: 0; font-size: 32px; line-height: 1.2; }
+.game-subtitle { color: var(--muted); margin: 12px 0 0; }
+.game-header { margin: 0; }
+.game-message { margin: 16px 0; color: var(--danger); }
+.game-message:last-child { margin-bottom: 0; }
+.game-empty-card { width: min(760px, 100%); margin: 0 auto; }
+.game-button-dark, .game-login-button { background: var(--green); }
+.game-actions, .game-active-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.game-empty-card button { margin-top: 24px; }
+.game-message + button { margin-top: 0; }
+.game-mode-title, .game-active-title, .game-next-title { font-size: 24px; }
+.game-mode-text, .game-active-text { color: var(--muted); }
+.game-join-modal-form { margin-top: 20px; }
+.game-join-modal-message { color: var(--danger); margin: 16px 0; }
+.single-game-result-modal { text-align: center; }
+.single-game-result-title { margin: 0 0 14px; }
+.single-game-result-secret { padding: 18px 16px; margin: 22px 0 18px; }
+.single-game-result-secret-label { font-size: 20px; margin-bottom: 8px; }
+.single-game-result-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+.single-game-result-stat { padding: 16px 10px; }
+.single-game-result-stat-label { font-size: 20px; margin-bottom: 6px; }
+.single-game-result-actions .single-game-button-dark { background: var(--green); }
+.single-game-result-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+.single-game-result-pill { margin-bottom: 16px; color: var(--muted); }
+@media (max-width: 560px) { h1, .game-title, .auth-title { font-size: 28px; } .game-card, .auth-card { padding: 20px 18px; } .single-game-result-actions { flex-direction: column; } }
+@media (prefers-reduced-motion: reduce) { :root { --motion: 0ms; } *, *::before, *::after { scroll-behavior: auto; } }

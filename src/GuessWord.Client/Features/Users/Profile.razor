@@ -1,0 +1,72 @@
+@page "/profile"
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject GuessWord.Client.State.UserStateService UserState
+@inject GuessWord.Client.Infrastructure.Http.AuthService AuthService
+@inject GuessWord.Client.Infrastructure.Http.UserService UserService
+
+<PageTitle>Профиль</PageTitle>
+
+<div class="profile-page">
+    @if (!UserState.IsInitialized || _isLoading)
+    {
+        <section class="profile-card profile-empty-card">
+            <h1 class="profile-empty-title">Профиль</h1>
+            <p class="profile-empty-text">Загрузка...</p>
+        </section>
+    }
+    else if (!UserState.IsAuthorized)
+    {
+        <section class="profile-card profile-empty-card">
+            <h1 class="profile-empty-title">Профиль</h1>
+            <p class="profile-empty-text">Войдите в аккаунт, чтобы открыть профиль.</p>
+            <button class="profile-login-button" @onclick="NavigateToLogin" type="button">Войти</button>
+        </section>
+    }
+    else if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <section class="profile-card profile-empty-card">
+            <h1 class="profile-empty-title">Профиль</h1>
+            <p class="profile-empty-text">@_errorMessage</p>
+        </section>
+    }
+    else if (_profile is not null)
+    {
+        <section class="profile-card profile-header">
+            <div class="profile-header-content">
+                <h1 class="profile-name">@DisplayName</h1>
+                <p class="profile-subtitle">Твой профиль и игровые достижения</p>
+            </div>
+
+            <button class="profile-logout-button" @onclick="Logout" type="button">Выйти</button>
+        </section>
+
+        <div class="profile-stats">
+            <section class="profile-stat-card">
+                <div class="profile-stat-value">@_profile.GamesCount</div>
+                <div class="profile-stat-label">Количество игр</div>
+            </section>
+
+            <section class="profile-stat-card">
+                <div class="profile-stat-value">@_profile.WinsCount</div>
+                <div class="profile-stat-label">Количество побед</div>
+            </section>
+
+            <section class="profile-stat-card">
+                <div class="profile-stat-value">@_profile.WinRate%</div>
+                <div class="profile-stat-label">Процент побед</div>
+            </section>
+        </div>
+
+        <section class="profile-card profile-history-card">
+            <button class="profile-history-button" @onclick="NavigateToHistory" type="button">История</button>
+
+            <div class="profile-history-content">
+                <h2 class="profile-history-title">История матчей</h2>
+                <p class="profile-history-text">
+                    Открой последние матчи, сравни результаты одиночных и мультиплеерных сессий и найди лучшие попытки.
+                </p>
+            </div>
+        </section>
+    }
+</div>
