@@ -1,0 +1,24 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY global.json ./
+COPY src/GuessWord.Contracts/GuessWord.Contracts.csproj src/GuessWord.Contracts/
+COPY src/GuessWord.Api/GuessWord.Api.csproj src/GuessWord.Api/
+COPY src/GuessWord.Client/GuessWord.Client.csproj src/GuessWord.Client/
+RUN dotnet restore src/GuessWord.Api/GuessWord.Api.csproj \
+    && dotnet restore src/GuessWord.Client/GuessWord.Client.csproj
+
+COPY src/ src/
+RUN dotnet publish src/GuessWord.Api/GuessWord.Api.csproj -c Release --no-restore -o /out/api \
+    && dotnet publish src/GuessWord.Client/GuessWord.Client.csproj -c Release --no-restore -o /out/client \
+    && mkdir -p /out/api/wwwroot \
+    && cp -a /out/client/wwwroot/. /out/api/wwwroot/
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /app
+COPY --from=build /out/api/ ./
+ENV ASPNETCORE_ENVIRONMENT=Production \
+    ASPNETCORE_URLS=http://0.0.0.0:8080
+EXPOSE 8080
+USER $APP_UID
+ENTRYPOINT ["dotnet", "GuessWord.Api.dll"]

@@ -16,6 +16,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Hosting request diagnostics include the query string, which can contain a SignalR JWT.
+builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
+
 builder.Services.AddControllers();
 builder.Services.AddScoped<GuessWord.Api.Features.Health.IDictionaryReadiness, GuessWord.Api.Features.Health.DictionaryReadiness>();
 builder.Services.AddExceptionHandler<GuessWord.Api.Middleware.ApiExceptionHandler>();
@@ -98,6 +101,24 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandler();
+
+// Only the combined publication has wwwroot; the existing API-only image still works.
+if (Directory.Exists(app.Environment.WebRootPath))
+{
+    app.UseBlazorFrameworkFiles();
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        OnPrepareResponse = context =>
+        {
+            // Revalidate the entry point and configuration after each deployment.
+            if (context.File.Name is "index.html" or "appsettings.json")
+                context.Context.Response.Headers.CacheControl = "no-cache";
+        }
+    });
+}
+
+// Route after static-file middleware, including its terminal /_framework branch.
+app.UseRouting();
 app.UseCors("AllowBlazor");
 
 app.UseAuthentication();
@@ -105,6 +126,27 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<GameHub>("/hubs/game");
+
+if (Directory.Exists(app.Environment.WebRootPath))
+{
+    // Reserve server and asset namespaces: missing endpoints must never return the SPA.
+    app.MapFallback("{*path:nonfile}", async context =>
+    {
+        string[] reserved = ["/api", "/health", "/hubs", "/_framework", "/_content", "/css", "/js", "/fonts", "/images", "/swagger"];
+        var requestPath = context.Request.PathBase.Add(context.Request.Path);
+        if (reserved.Any(prefix => requestPath.StartsWithSegments(prefix))
+            || !HttpMethods.IsGet(context.Request.Method) && !HttpMethods.IsHead(context.Request.Method))
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            return;
+        }
+
+        context.Response.ContentType = "text/html; charset=utf-8";
+        context.Response.Headers.CacheControl = "no-cache";
+        if (!HttpMethods.IsHead(context.Request.Method))
+            await context.Response.SendFileAsync(Path.Combine(app.Environment.WebRootPath, "index.html"));
+    });
+}
 
 using (var scope = app.Services.CreateScope())
 {
