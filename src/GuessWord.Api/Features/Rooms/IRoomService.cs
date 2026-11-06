@@ -8,6 +8,6 @@ namespace GuessWord.Api.Features.Rooms
         Task<RoomResponseDto?> JoinRoomAsync(int userId, string code);
         Task<RoomResponseDto?> GetCurrentRoomAsync(int userId);
         Task<RoomResponseDto?> GetRoomAsync(int userId, string code);
-        Task<bool> LeaveRoomAsync(int userId, string code);
+        Task<bool> LeaveRoomAsync(int userId, string code, int? expectedGameId = null);
     }
 }

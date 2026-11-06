@@ -42,6 +42,9 @@ public partial class MultiplayerGamePage
         if (loadedRoute == GameId) return;
         loadedRoute = GameId;
         ++snapshotRequest;
+        currentGame = null;
+        shownResultGameId = null;
+        displayAttempts.Clear();
         if (subscription is not null) await subscription.DisposeAsync();
         subscription = null;
         isLoading = true;
@@ -138,9 +141,30 @@ public partial class MultiplayerGamePage
         Navigation.NavigateTo("/login");
     }
 
-    private void NavigateToLobby()
+    private async Task NavigateToLobby()
     {
-        Navigation.NavigateTo(currentGame?.RoomCode is string code ? $"/game/room/{code}" : "/game");
+        if (isSubmitting) return;
+        isSubmitting = true;
+        try { await NavigateToCurrentRoomAsync(); }
+        finally { isSubmitting = false; }
+    }
+
+    private async Task NavigateToCurrentRoomAsync()
+    {
+        var room = currentGame?.RoomCode is string code
+            ? await RoomService.GetRoomAsync(code)
+            : await RoomService.GetCurrentRoomAsync();
+        if (disposed) return;
+        if (room is null && currentGame is not null)
+        {
+            pageMessage = "Не удалось получить состояние комнаты. Попробуйте ещё раз.";
+            return;
+        }
+        if (resultDialogModule is not null && currentGame is not null && HasPersonalResult)
+            await resultDialogModule.InvokeVoidAsync("close", resultDialogRef);
+        // Страница комнаты повторно читает снимок и открывает актуальный раунд,
+        // даже если хост успел начать его во время перехода.
+        Navigation.NavigateTo(room is null ? "/game" : $"/game/room/{room.Code}");
     }
 
     private async Task LeaveRoomAsync()
@@ -149,8 +173,12 @@ public partial class MultiplayerGamePage
         isSubmitting = true;
         try
         {
-            if (await RoomService.LeaveRoomAsync(code)) Navigation.NavigateTo("/game");
+            if (await RoomService.LeaveRoomAsync(code, currentGame.GameId)) Navigation.NavigateTo("/game");
             else pageMessage = "Не удалось выйти из комнаты.";
+        }
+        catch (Infrastructure.Http.ApiRequestException error) when (error.Code == "room_round_changed")
+        {
+            await NavigateToCurrentRoomAsync();
         }
         catch (Infrastructure.Http.ApiRequestException error)
         {

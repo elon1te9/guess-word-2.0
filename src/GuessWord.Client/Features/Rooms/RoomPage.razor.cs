@@ -149,10 +149,25 @@ public partial class RoomPage
         isLeaving = true;
 
         var roomCode = room.Code;
-        if (!await RoomService.LeaveRoomAsync(roomCode))
+        try
+        {
+            if (!await RoomService.LeaveRoomAsync(roomCode, room.GameId ?? 0))
+            {
+                isLeaving = false;
+                errorMessage = "Не удалось выйти из комнаты. Попробуйте ещё раз.";
+                return;
+            }
+        }
+        catch (Infrastructure.Http.ApiRequestException error) when (error.Code == "room_round_changed")
         {
             isLeaving = false;
-            errorMessage = "Не удалось выйти из комнаты. Попробуйте ещё раз.";
+            await LoadRoomAsync();
+            return;
+        }
+        catch (Infrastructure.Http.ApiRequestException error)
+        {
+            isLeaving = false;
+            errorMessage = error.Message;
             return;
         }
 

@@ -71,7 +71,7 @@ public class RoomService(AppDbContext db, GameMutation mutation) : IRoomService
         };
     }
 
-    public async Task<bool> LeaveRoomAsync(int userId, string code)
+    public async Task<bool> LeaveRoomAsync(int userId, string code, int? expectedGameId = null)
     {
         code = GameDataAccess.NormalizeRoomCode(code);
         await using var tx = await db.Database.BeginTransactionAsync();
@@ -80,6 +80,10 @@ public class RoomService(AppDbContext db, GameMutation mutation) : IRoomService
         await db.Entry(room).Collection(r => r.Members).LoadAsync();
         var member = room.Members.SingleOrDefault(m => m.UserId == userId);
         if (member is null) return true; // повтор выхода после commit безопасен
+        // Проверяем под блокировкой комнаты: запоздалый выход не затрагивает новый раунд.
+        // 0 обозначает комнату, в которой ещё не было матчей; null — прежний API-клиент.
+        if (expectedGameId.HasValue && expectedGameId.Value != (room.GameId ?? 0))
+            throw new GameRuleException("room_round_changed", "Состояние комнаты изменилось.");
         if (room.Status == RoomStatus.InGame && room.GameId is int gameId)
         {
             var game = await mutation.LockGameAsync(gameId, userId, GameMode.Multiplayer);

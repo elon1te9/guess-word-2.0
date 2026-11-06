@@ -45,9 +45,9 @@ public class ApiRequestService
         return await SendAsync(() => _httpClient.PostAsJsonAsync(url, data));
     }
 
-    public async Task<bool> PostAsync(string url)
+    public async Task<bool> PostAsync(string url, bool throwProblem = false)
     {
-        return await SendAsync(() => _httpClient.PostAsync(url, content: null));
+        return await SendAsync(() => _httpClient.PostAsync(url, content: null), throwProblem);
     }
 
     private async Task HandleUnauthorizedAsync()
@@ -86,7 +86,7 @@ public class ApiRequestService
         }
     }
 
-    private async Task<bool> SendAsync(Func<Task<HttpResponseMessage>> sendRequest)
+    private async Task<bool> SendAsync(Func<Task<HttpResponseMessage>> sendRequest, bool throwProblem = false)
     {
         try
         {
@@ -95,8 +95,15 @@ public class ApiRequestService
             if (!await EnsureAuthorizedAsync(response))
                 return false;
 
+            if (!response.IsSuccessStatusCode && throwProblem &&
+                response.Content.Headers.ContentType?.MediaType == "application/problem+json")
+            {
+                var error = await response.Content.ReadFromJsonAsync<ApiProblem>();
+                throw new ApiRequestException(error?.Code ?? "request_failed", error?.Title ?? "Запрос отклонён.", (int)response.StatusCode);
+            }
             return response.IsSuccessStatusCode;
         }
+        catch (ApiRequestException) { throw; }
         catch
         {
             return false;

@@ -67,13 +67,13 @@ namespace GuessWord.Api.Features.Rooms
         }
 
         [HttpPost("{code}/leave")]
-        public async Task<IActionResult> LeaveRoom(string code)
+        public async Task<IActionResult> LeaveRoom(string code, [FromQuery] int? expectedGameId = null)
         {
             var userId = GetUserId();
             var normalizedCode = NormalizeRoomCode(code);
 
             var before = await _roomService.GetRoomAsync(userId, normalizedCode);
-            var result = await _roomService.LeaveRoomAsync(userId, normalizedCode);
+            var result = await _roomService.LeaveRoomAsync(userId, normalizedCode, expectedGameId);
             if (!result)
                 return NotFound();
 

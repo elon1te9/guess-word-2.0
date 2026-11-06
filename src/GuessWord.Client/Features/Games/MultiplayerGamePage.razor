@@ -44,7 +44,7 @@
                 <p class="single-game-message" role="alert">@pageMessage</p>
             }
 
-            <button class="single-game-button single-game-button-dark" @onclick="NavigateToLobby" type="button">В лобби</button>
+            <button class="single-game-button single-game-button-dark" @onclick="NavigateToLobby" disabled="@isSubmitting" type="button">В лобби</button>
         </section>
     }
     else
@@ -159,7 +159,7 @@
             }
             else
             {
-                <button class="single-game-button single-game-button-dark" @onclick="NavigateToLobby" type="button">В лобби</button>
+                <button class="single-game-button single-game-button-dark" @onclick="NavigateToLobby" disabled="@isSubmitting" type="button">В лобби</button>
             }
         </div>
     </dialog>

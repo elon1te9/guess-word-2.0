@@ -36,8 +36,8 @@ public class RoomService
         return await _apiRequestService.GetAsync<RoomResponseDto>($"api/room/{code}", cancellationToken);
     }
 
-    public async Task<bool> LeaveRoomAsync(string code)
+    public async Task<bool> LeaveRoomAsync(string code, int expectedGameId)
     {
-        return await _apiRequestService.PostAsync($"api/room/{code}/leave");
+        return await _apiRequestService.PostAsync($"api/room/{code}/leave?expectedGameId={expectedGameId}", throwProblem: true);
     }
 }
